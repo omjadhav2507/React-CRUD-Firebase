@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import Swal from 'sweetalert2';
 
-function Edit({ employess,selectedEmp ,setEmployees , setIsEditing}) {
+import {db} from '../../config/firestore'
+import { doc ,setDoc } from "firebase/firestore"; 
+
+function Edit({ employess,selectedEmp ,setEmployees , setIsEditing ,getEmployees}) {
 
   const id = selectedEmp.id;
 
@@ -11,7 +14,7 @@ function Edit({ employess,selectedEmp ,setEmployees , setIsEditing}) {
     const [salary, setSalary] = useState(selectedEmp.salary)
     const [date, setDate] = useState(selectedEmp.date)
 
-   const handleUpdatet =(e)=>{
+   const handleUpdatet = async (e)=>{
     e.preventDefault();
 
     if(!firstName || !lastName || !email || !salary || !date){
@@ -33,9 +36,12 @@ function Edit({ employess,selectedEmp ,setEmployees , setIsEditing}) {
       };
     
 
+      await setDoc(doc(db, "employees", id), {
+        ...employee
+      });
 
     setEmployees(prevEmployees => prevEmployees.map(emp => (emp.id === id ? employee : emp)));
-
+    getEmployees()
 
     setIsEditing(true)
 

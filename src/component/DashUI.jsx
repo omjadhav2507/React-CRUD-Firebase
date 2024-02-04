@@ -1,26 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './DashComponent/header';
 import Add from './DashComponent/Add';
-import { employeesData } from './DashComponent/Data';
 import Table from './DashComponent/Table';
 import Edit from './DashComponent/Edit';
 import Swal from 'sweetalert2';
 
+import { collection, getDocs ,doc , deleteDoc } from "firebase/firestore"; 
+import {db} from '../config/firestore'
+
 function DashUI({ setIsAuthenticated  }) {
+
   const [isAdding, setIsAdding] = useState(false);
-  const [isEding ,setIsEditing] = useState(false)
-  const [employees, setEmployees] = useState(employeesData);
-  const [ selectedEmp , setSelectedEmp] = useState(null);
+  const [isEding,  setIsEditing] = useState(false)
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmp, setSelectedEmp] = useState(null);
 
 
 
-  const handleEdit = (id) => {
+  const getEmployees = async () =>{
+    
+    const querySnapshot = await getDocs(collection(db, "employees"));
+    const employees = querySnapshot.docs.map(doc =>({id:doc.id , ...doc.data()}))
+    setEmployees(employees)
+    
+  } 
+
+
+
+useEffect(()=>{
+    getEmployees()
+},[])
+
+
+
+const handleEdit = (id) => {
     const [employee] = employees.filter(employee => employee.id === id)
     setSelectedEmp(employee)
     setIsEditing(true)
-  };
+};
 
-  const handleDelete = (id) => {
+const handleDelete = (id) => {
     Swal.fire({
       icon: 'warning',
       title: 'Are you sure?',
@@ -31,6 +50,9 @@ function DashUI({ setIsAuthenticated  }) {
     }).then(res=>{
       if(res.value){
         const [employee]= employees.filter(employee => employee.id !== id)
+
+        deleteDoc(doc(db, "employees", id));
+
         Swal.fire({
           icon: 'success',
           title: 'Deleted!',
@@ -38,13 +60,14 @@ function DashUI({ setIsAuthenticated  }) {
           showConfirmButton: false,
           timer: 1500,
         });
+
         const empcopy = employees.filter(emp => emp.id !== id)
         setEmployees (empcopy);
       }
     })
-  };
+};
 
-  return (
+return (
     <>
       {!isAdding && (
         <>
@@ -65,6 +88,7 @@ function DashUI({ setIsAuthenticated  }) {
       setIsAdding={setIsAdding}
       setEmployees={setEmployees}
       employess={employees}
+      getEmployees={getEmployees}
        />}
 
        {isEding && (
@@ -73,6 +97,7 @@ function DashUI({ setIsAuthenticated  }) {
         selectedEmp = {selectedEmp}
         setEmployees ={setEmployees}
         setIsEditing ={setIsEditing}
+        getEmployees={getEmployees}
         />
        )}
     </>

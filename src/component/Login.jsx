@@ -1,21 +1,31 @@
 import React, { useState } from 'react'
+import Swal from 'sweetalert2';
 
 function Login({setIsAuthenticated}) {
 
 const adminEmail = 'om@25.com'
 const adminPassword = '411019'
 
-const [email , setEmail] = useState('');
-const [password , setPassword] = useState('');
+const [email , setEmail] = useState('om@25.com');
+const [password , setPassword] = useState('411019');
 
 const handleLogin =(e)=>{
     e.preventDefault();
     if (email === adminEmail && password === adminPassword){
         localStorage.setItem('is_auth',true);
         setIsAuthenticated(true);
-        console.log("successfully logged in!")
+        Swal.fire({
+            icon: 'success',
+            title: 'Successfully Logged In!',
+            showConfirmButton: false,
+            timer: 1500,
+          });
     }else{
-        console.log("Incorrect email or password.")
+        Swal.fire({
+            icon: 'error',
+            title: 'Incorrect email or password',
+            text: 'Please try again',
+          });
     }
 
 

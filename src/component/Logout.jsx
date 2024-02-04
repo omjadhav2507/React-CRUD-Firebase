@@ -1,10 +1,16 @@
 import React from 'react'
+import { getAuth, signOut } from "firebase/auth";
 
 function Logout({setIsAuthenticated}) {
 
     const handleLogout =()=>{
-    localStorage.setItem('is_authenticated', false);
-    setIsAuthenticated(false);
+      const auth = getAuth();
+      signOut(auth).then(() => {
+        setIsAuthenticated(false);
+      }).catch((error) => {
+        console.log(error)
+      });
+    
     }
 
   return (

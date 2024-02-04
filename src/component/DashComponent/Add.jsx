@@ -54,9 +54,6 @@ getEmployees()
       });
       setIsAdding(false)
 }
-
-
-
     return (
         <>
             <div>
